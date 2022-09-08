@@ -1,14 +1,18 @@
 package com.githubinfo.service.impl;
 
+import com.githubinfo.constant.GitHubApiUrlConstants;
 import com.githubinfo.converter.GitHubDtoConverter;
 import com.githubinfo.dto.RepositoryDto;
 import com.githubinfo.dto.githubapi.ApiGitHubBranchDto;
 import com.githubinfo.dto.githubapi.ApiGitHubRepositoryDto;
+import com.githubinfo.exception.GitHubUserNotFound;
 import com.githubinfo.service.GitHubInfoService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -21,31 +25,39 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class GitHubInfoServiceImpl implements GitHubInfoService {
 
   private final RestTemplate restTemplate;
   private final GitHubDtoConverter gitHubDtoConverter;
 
-  @Value("${default-github-api-url}")
-  private String defaultGitHubApiUrl;
 
   @Override
   public List<RepositoryDto> findGitHubInfoByUsername(String username) {
-    Map<ApiGitHubRepositoryDto, List<ApiGitHubBranchDto>> responseMap = findAllRepositoriesByUsername(username)
+    List<ApiGitHubRepositoryDto> repositories;
+    try {
+      repositories = findAllRepositoriesByUsername(username);
+    }catch (HttpClientErrorException e) {
+      log.debug("Error: ", e);
+      if (e.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+        throw new GitHubUserNotFound(username, e);
+      }
+      throw e;
+    }
+    Map<ApiGitHubRepositoryDto, List<ApiGitHubBranchDto>> responseMap = repositories
         .stream()
         .filter(apiGitHubRepositoryDto -> !apiGitHubRepositoryDto.fork())
         .collect(Collectors.toMap(
             Function.identity(),
             apiGitHubRepositoryDto -> findAllBranchByUsernameAndRepositoryName(apiGitHubRepositoryDto.owner().login(), apiGitHubRepositoryDto.name())
         ));
-
     return gitHubDtoConverter.mapOfApiGitHubRepositoryDtoAndApiGitHubBranchDtosToListOfRepositoryDto(responseMap);
   }
 
   private List<ApiGitHubRepositoryDto> findAllRepositoriesByUsername(String username) {
     return findAllPageableElementsFromApi(
-        String.format("%s/users/%s/repos", defaultGitHubApiUrl, username),
+        String.format(GitHubApiUrlConstants.REPOSITORIES_URL, username),
         ApiGitHubRepositoryDto[].class,
         100
     );
@@ -53,7 +65,7 @@ public class GitHubInfoServiceImpl implements GitHubInfoService {
 
   private List<ApiGitHubBranchDto> findAllBranchByUsernameAndRepositoryName(String username, String repositoryName) {
     return findAllPageableElementsFromApi(
-        String.format("%s/repos/%s/%s/branches", defaultGitHubApiUrl, username, repositoryName),
+        String.format(GitHubApiUrlConstants.BRANCHES_URL, username, repositoryName),
         ApiGitHubBranchDto[].class,
         100
     );
