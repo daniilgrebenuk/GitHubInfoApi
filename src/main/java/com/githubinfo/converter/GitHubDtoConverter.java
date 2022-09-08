@@ -4,6 +4,7 @@ import com.githubinfo.dto.BranchDto;
 import com.githubinfo.dto.RepositoryDto;
 import com.githubinfo.dto.githubapi.ApiGitHubBranchDto;
 import com.githubinfo.dto.githubapi.ApiGitHubCommitDto;
+import com.githubinfo.dto.githubapi.ApiGitHubOwnerDto;
 import com.githubinfo.dto.githubapi.ApiGitHubRepositoryDto;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +20,7 @@ public class GitHubDtoConverter {
         .stream()
         .map(e -> {
           String repositoryName = e.getKey().name();
-          String owner = e.getKey().owner().login();
+          String owner = Optional.of(e.getKey()).map(ApiGitHubRepositoryDto::owner).map(ApiGitHubOwnerDto::login).orElse(null);
           List<BranchDto> branches = e.getValue()
               .stream()
               .map(this::apiGitHubBranchDtoToBranchDto)
