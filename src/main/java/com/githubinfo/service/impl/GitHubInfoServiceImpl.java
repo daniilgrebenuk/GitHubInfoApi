@@ -24,8 +24,8 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Service
 @Slf4j
+@Service
 @RequiredArgsConstructor
 public class GitHubInfoServiceImpl implements GitHubInfoService {
 
@@ -38,8 +38,8 @@ public class GitHubInfoServiceImpl implements GitHubInfoService {
     List<ApiGitHubRepositoryDto> repositories;
     try {
       repositories = findAllRepositoriesByUsername(username);
-    }catch (HttpClientErrorException e) {
-      log.debug("Error: ", e);
+    } catch (HttpClientErrorException e) {
+      log.error("Error: ", e);
       if (e.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
         throw new GitHubUserNotFound(username, e);
       }

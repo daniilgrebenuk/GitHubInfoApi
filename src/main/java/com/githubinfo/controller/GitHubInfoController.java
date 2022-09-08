@@ -15,6 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("api/github")
 public class GitHubInfoController {
+
   private final GitHubInfoService gitHubInfoService;
 
   @GetMapping("/user")

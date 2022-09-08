@@ -3,11 +3,13 @@ package com.githubinfo.converter;
 import com.githubinfo.dto.BranchDto;
 import com.githubinfo.dto.RepositoryDto;
 import com.githubinfo.dto.githubapi.ApiGitHubBranchDto;
+import com.githubinfo.dto.githubapi.ApiGitHubCommitDto;
 import com.githubinfo.dto.githubapi.ApiGitHubRepositoryDto;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class GitHubDtoConverter {
@@ -28,6 +30,9 @@ public class GitHubDtoConverter {
   }
 
   public BranchDto apiGitHubBranchDtoToBranchDto(ApiGitHubBranchDto apiGitHubBranchDto) {
-    return new BranchDto(apiGitHubBranchDto.name(), apiGitHubBranchDto.commit().sha());
+    return new BranchDto(
+        apiGitHubBranchDto.name(),
+        Optional.of(apiGitHubBranchDto).map(ApiGitHubBranchDto::commit).map(ApiGitHubCommitDto::sha).orElse(null)
+    );
   }
 }
