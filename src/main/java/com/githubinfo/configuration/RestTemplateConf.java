@@ -13,7 +13,11 @@ public class RestTemplateConf {
   private String gitHubAuthorizationToken;
 
   @Bean
-  public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
-    return restTemplateBuilder.defaultHeader("Authorization", String.format("Bearer %s", gitHubAuthorizationToken)).build();
+  public RestTemplate restTemplate() {
+    RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
+    if (gitHubAuthorizationToken != null) {
+      restTemplateBuilder.defaultHeader("Authorization", String.format("Bearer %s", gitHubAuthorizationToken));
+    }
+    return restTemplateBuilder.build();
   }
 }
