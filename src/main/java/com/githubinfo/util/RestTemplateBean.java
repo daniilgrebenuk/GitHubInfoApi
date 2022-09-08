@@ -12,6 +12,6 @@ public class RestTemplateBean {
 
   @Bean
   public RestTemplate restTemplate(RestTemplateBuilder builder) {
-    return builder.build();
+    return builder.defaultHeader("Authorization", "Bearer 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").build();
   }
 }
