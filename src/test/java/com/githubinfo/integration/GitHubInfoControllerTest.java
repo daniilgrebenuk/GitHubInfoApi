@@ -1,5 +1,6 @@
-package com.githubinfo.controller;
+package com.githubinfo.integration;
 
+import com.githubinfo.dto.RepositoryDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +20,14 @@ class GitHubInfoControllerTest {
 
   @Autowired
   private TestRestTemplate restTemplate;
+
+  @Test
+  void getUserWithOnlyFork() {
+    String username = "Tiltman";
+
+    assertThat(restTemplate.getForEntity(String.format("http://localhost:%d/api/github/user?username=%s", port, username), RepositoryDto[].class).getBody())
+        .hasSize(0);
+  }
 
   @Test
   void getUserInfo() {

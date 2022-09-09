@@ -1,6 +1,7 @@
 package com.githubinfo.service.impl;
 
 import com.githubinfo.constant.GitHubApiUrlConstants;
+import com.githubinfo.constant.GitHubUtilConstants;
 import com.githubinfo.converter.GitHubDtoConverter;
 import com.githubinfo.dto.RepositoryDto;
 import com.githubinfo.dto.githubapi.ApiGitHubBranchDto;
@@ -33,6 +34,8 @@ public class GitHubInfoServiceImpl implements GitHubInfoService {
   private final GitHubDtoConverter gitHubDtoConverter;
 
 
+
+
   @Override
   public List<RepositoryDto> findGitHubInfoByUsername(String username) {
     List<ApiGitHubRepositoryDto> repositories;
@@ -59,7 +62,7 @@ public class GitHubInfoServiceImpl implements GitHubInfoService {
     return findAllPageableElementsFromApi(
         String.format(GitHubApiUrlConstants.REPOSITORIES_URL, username),
         ApiGitHubRepositoryDto[].class,
-        100
+        GitHubUtilConstants.AMOUNT_OF_REPOSITORIES_ON_PAGE
     );
   }
 
@@ -67,7 +70,7 @@ public class GitHubInfoServiceImpl implements GitHubInfoService {
     return findAllPageableElementsFromApi(
         String.format(GitHubApiUrlConstants.BRANCHES_URL, username, repositoryName),
         ApiGitHubBranchDto[].class,
-        100
+        GitHubUtilConstants.AMOUNT_OF_BRANCHES_ON_PAGE
     );
   }
 
@@ -77,8 +80,8 @@ public class GitHubInfoServiceImpl implements GitHubInfoService {
     while (resultList.size() % numberOfElementsOnPage == 0) {
       ResponseEntity<T[]> responseBranches = restTemplate.getForEntity(
           UriComponentsBuilder.fromHttpUrl(url)
-              .queryParam("per_page", numberOfElementsOnPage)
-              .queryParam("page", page++)
+              .queryParam(GitHubUtilConstants.AMOUNT_OF_ELEMENTS_ON_PAGE_PARAM_NAME, numberOfElementsOnPage)
+              .queryParam(GitHubUtilConstants.NUMBER_OF_PAGE_PARAM_NAME, page++)
               .build().toUriString(),
           tClass
       );
