@@ -11,9 +11,11 @@ public class GitHubUserNotFound extends RuntimeException {
 
   public GitHubUserNotFound(String username) {
     super(String.format(GitHubInfoErrorConstants.USER_NOT_FOUND, username));
+    this.username = username;
   }
 
   public GitHubUserNotFound(String username, Throwable cause) {
     super(String.format(GitHubInfoErrorConstants.USER_NOT_FOUND, username), cause);
+    this.username = username;
   }
 }
