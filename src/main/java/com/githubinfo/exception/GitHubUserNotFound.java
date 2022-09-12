@@ -1,7 +1,9 @@
 package com.githubinfo.exception;
 
 import com.githubinfo.constant.GitHubInfoErrorConstants;
+import lombok.Getter;
 
+@Getter
 public class GitHubUserNotFound extends RuntimeException {
 
   private String username;
