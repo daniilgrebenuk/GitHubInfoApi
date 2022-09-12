@@ -8,8 +8,6 @@ public class GitHubUserNotFound extends RuntimeException {
 
   private String username;
 
-  public GitHubUserNotFound() {
-  }
 
   public GitHubUserNotFound(String username) {
     super(String.format(GitHubInfoErrorConstants.USER_NOT_FOUND, username));
